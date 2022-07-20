@@ -44,6 +44,16 @@ variable "vm_size" {
     default = "Standard_D2s_v3"
 }
 
+variable "os_disk_type" {
+  type = string
+  default = "Standard_LRS"
+}
+
+variable "os_disk_size" {
+    type = string
+    default = "30"
+}
+
 variable "admin_username" {
     type = string
     default = "adminuser"
