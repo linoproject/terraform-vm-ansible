@@ -41,7 +41,10 @@ resource "null_resource" "roles" {
   
 }
 
-
+locals {
+  local_ansible_file = var.file_path != null ? [var.file_path] : []
+  local_ansible_file_exec = var.file_only == true ? [] : [var.file_path]
+}
 
 resource "null_resource" "ansible_file" {
 
@@ -49,6 +52,8 @@ resource "null_resource" "ansible_file" {
       null_resource.ansible_depends,
       null_resource.roles      
     ]
+
+    count = length(local.local_ansible_file)
 
     connection {
         type = "ssh"
@@ -62,6 +67,23 @@ resource "null_resource" "ansible_file" {
         destination = "/home/${var.user}/ansible/${basename(var.file_path)}"
     }
 
+    
+}
+
+resource "null_resource" "ansible_file_exec" {
+     depends_on = [
+      null_resource.ansible_depends,
+      null_resource.roles,      
+      null_resource.ansible_file
+    ]
+    count = length(local.local_ansible_file_exec)
+
+    connection {
+        type = "ssh"
+        host = var.ip
+        user = var.user
+        private_key = file(var.rsa_key_path)
+    }
     provisioner "remote-exec" {
         inline = [
             "sudo /usr/bin/ansible-playbook /home/${var.user}/ansible/${basename(var.file_path)}",
@@ -69,4 +91,3 @@ resource "null_resource" "ansible_file" {
         ]
     }
 }
-

@@ -26,3 +26,7 @@ variable "ansible_depends" {
     }))
     default = {}
 }
+variable "file_only" {
+    type = bool
+    default = false 
+}
